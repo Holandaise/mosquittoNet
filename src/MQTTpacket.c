@@ -53,7 +53,7 @@ static int calcLength(char *p, int x){
 	@param: pointer to BUFFER
 	@param: pointer to MQTT Connect Packet
 */		
-int CONNECTbuilder(char *BUFF, MQTTpacket *self)
+static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 {
 	CONN_PAYLOAD *PL = (CONN_PAYLOAD*)self->payload;
 	int size = sizeof(CONN_PAYLOAD) - sizeof(char *) + strlen(PL->CLIENT_ID);
@@ -82,7 +82,7 @@ int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 	@param: pointer to BUFFER
 	@param: pointer to MQTT Subscribe Packet
  */
-int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
+static int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
 {
 	SUB_PAYLOAD *PL = (SUB_PAYLOAD*)self->payload;
 	int size = sizeof(SUB_PAYLOAD) - sizeof(char*) + strlen(PL->TOPIC);
@@ -100,14 +100,14 @@ int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
 	return (size + (3-remLen));
 }
 
-int DISCONNECTbuilder(char *BUFF, MQTTpacket *self){
+static int DISCONNECTbuilder(char *BUFF, MQTTpacket *self){
 	// Only Control Header and 1 byte of remaining length set to 0
 	memcpy(BUFF, &self->header, 2);
 
 	return 2;
 }
 
-const MQTTheader CONTROL_HEADERS[] = {
+static const MQTTheader CONTROL_HEADERS[] = {
     {0x10, {0,0,0,0}},
 	{0xE0, {0,0,0,0}},
     {0x80, {0,0,0,0}}

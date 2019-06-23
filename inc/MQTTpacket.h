@@ -32,7 +32,7 @@ TODO:
 */
 
 // Index for MQTT header Control Codes
-typedef const enum ControlCode{
+typedef enum ControlCode{
     CONNECT,
     DISCONNECT,
     SUBSCRIBE
@@ -88,7 +88,7 @@ typedef struct SUB_PAYLOAD{
 	char QOS;
 }SUB_PAYLOAD;
 
-const MQTTheader CONTROL_HEADERS[3]; // Array of pre-defined MQTT Headers indexed by Control Codes
+static const MQTTheader CONTROL_HEADERS[3]; // Array of pre-defined MQTT Headers indexed by Control Codes
 
 extern MQTTpacket CONNECT_P;    // Packet defined in MQTTpacket.c
 extern MQTTpacket SUBSCRIBE_P;  // Packet defined in MQTTpacket.c
@@ -97,9 +97,4 @@ extern MQTTpacket DISCONN_P;
 void MQTT_Connect(MQTTpacket *CP, const char *clientID);
 void MQTT_Subscribe(MQTTpacket *SP, const char *topic, char QOS);
 
-int CONNECTbuilder(char *BUFF, MQTTpacket *self);
-
-int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self);
-
-int DISCONNECTbuilder(char *BUFF, MQTTpacket *self);
 #endif
