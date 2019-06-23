@@ -4,19 +4,11 @@ int main(){
     CONTEXT *ctx;
     ctx = connectBroker("192.168.0.101", 1883, "mosq_001");
 
-    switch(ctx->state){
-        case CONNECTED:
-            printf("Connected\n");
-            break;
-        case CONN_ACK:
-            printf("Connection Acknowledged\n");
-            break;
-        default:
-            printf("Unknown error\n");
-            break;
-    }
-    getchar();
+    char *c = (ctx->state == CONNECTED) ? "Connected" : "Conn-Ack";
 
+    printf("%s\n", c);
+    getchar();
+    disconnect(ctx);
     free(ctx);
     return 0;
 }

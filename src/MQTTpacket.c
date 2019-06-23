@@ -53,10 +53,10 @@ static int calcLength(char *p, int x){
 	@param: pointer to BUFFER
 	@param: pointer to MQTT Connect Packet
 */		
-static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
+int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 {
 	CONN_PAYLOAD *PL = (CONN_PAYLOAD*)self->payload;
-	int size = sizeof(CONN_PAYLOAD) - sizeof(char *) + strlen(PL->CLIENT_ID) - 4;
+	int size = sizeof(CONN_PAYLOAD) - sizeof(char *) + strlen(PL->CLIENT_ID);
 
 	int remLen = calcLength(
 			self->header.remainingLen,
@@ -82,26 +82,34 @@ static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 	@param: pointer to BUFFER
 	@param: pointer to MQTT Subscribe Packet
  */
-static int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
+int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
 {
-	int bytesWritten;
 	SUB_PAYLOAD *PL = (SUB_PAYLOAD*)self->payload;
+	int size = sizeof(SUB_PAYLOAD) - sizeof(char*) + strlen(PL->TOPIC);
 	int remLen = calcLength(
 		self->header.remainingLen,
-		sizeof(SUB_PAYLOAD));
+		size);
 	
 	memcpy(BUFF, &self->header, remLen+1);
-	memcpy(BUFF+remLen+1, PL, sizeof(short)*2);
-	strcpy(BUFF+remLen+1+(sizeof(short)*2), PL->TOPIC);
+	memcpy(BUFF+remLen+1, PL, 4);
+	strcpy(BUFF+remLen+5, PL->TOPIC);
 
 	//todo move QOS into buffer, and update retval
-	bytesWritten = (remLen + 1 + sizeof(short)*2 + strlen(PL->TOPIC));
 	free(self->payload);
-	return bytesWritten;
+	// 3-remLen = header size
+	return (size + (3-remLen));
 }
 
-const MQTTheader CONTROL_HEADERS[2] = {
+int DISCONNECTbuilder(char *BUFF, MQTTpacket *self){
+	// Only Control Header and 1 byte of remaining length set to 0
+	memcpy(BUFF, &self->header, 2);
+
+	return 2;
+}
+
+const MQTTheader CONTROL_HEADERS[] = {
     {0x10, {0,0,0,0}},
+	{0xE0, {0,0,0,0}},
     {0x80, {0,0,0,0}}
 };
 
@@ -109,6 +117,12 @@ MQTTpacket CONNECT_P = {
     CONTROL_HEADERS[CONNECT],
     NULL,
     CONNECTbuilder
+};
+
+MQTTpacket DISCONN_P = {
+	CONTROL_HEADERS[DISCONNECT],
+	NULL,
+	DISCONNECTbuilder
 };
 
 MQTTpacket SUBSCRIBE_P = {

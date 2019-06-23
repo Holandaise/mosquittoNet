@@ -11,7 +11,6 @@ CONTEXT *connectBroker(
     int port,
     const char* clientID
 ){
-    struct sockaddr_in server;
     //establish connection
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
     CTX->BUFFER = malloc(sizeof(MQTTpacket));
@@ -24,11 +23,11 @@ CONTEXT *connectBroker(
         CTX->state = START;
         return CTX;
     }
-    server.sin_addr.s_addr = inet_addr(host);
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
+    CTX->server.sin_addr.s_addr = inet_addr(host);
+    CTX->server.sin_family = AF_INET;
+    CTX->server.sin_port = htons(port);
 
-    if(connect(CTX->socket_fd, (struct sockaddr*)&server, sizeof(server))){
+    if(connect(CTX->socket_fd, (struct sockaddr*)&CTX->server, sizeof(struct sockaddr_in))){
         puts("Unable to connect\nExiting...\n");
         close(CTX->socket_fd);
         return CTX;
@@ -57,3 +56,24 @@ CONTEXT *connectBroker(
 }
 
 void subscribe(CONTEXT *ctx, const char *topic, char qos);
+
+void disconnect(CONTEXT *ctx){
+    //free previous context
+    //NOTE: unecessary because i'm smart, and free packet after previous
+    // buffer is written *wink wink*
+    //free(ctx->packet.payload);
+
+    //send disconnect
+    ctx->packet = DISCONN_P;
+    ctx->BUFF_SIZE = ctx->packet.build(ctx->BUFFER, &ctx->packet);
+
+    if(send(ctx->socket_fd, ctx->BUFFER, ctx->BUFF_SIZE, 0)<0){
+        puts("Error: cannot send packet DISCONNECT\n");
+        
+        exit(EXIT_FAILURE);
+    }
+    //tear down context, free memory
+    close(ctx->socket_fd);
+    free(ctx->BUFFER);
+    ctx->state = DISCONNECTED;
+}

@@ -3,6 +3,7 @@
 
 #include "MQTTpacket.h"
 #include <sys/socket.h>
+#include <arpa/inet.h>
 
 /*  Interface to MQTTpackets and internet sockets */
 
@@ -11,11 +12,13 @@ typedef enum STATE{
     CONNECTED,
     CONN_ACK,
     SUBSCRIBED,
-    SUB_ACK
+    SUB_ACK,
+    DISCONNECTED
 }STATE;
 
 typedef struct CONTEXT{
     MQTTpacket packet;
+    struct sockaddr_in server;
     STATE state;
     int socket_fd;
     int BUFF_SIZE;
@@ -25,5 +28,6 @@ typedef struct CONTEXT{
 CONTEXT *connectBroker(const char *host, int port, const char *clientID);
 void subscribe(CONTEXT* ctx, const char *topic, char qos);
 void publish(CONTEXT *ctx, const char *topic, const char *msg);
+void disconnect(CONTEXT *ctx);
 
 #endif
