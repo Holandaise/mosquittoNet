@@ -2,8 +2,11 @@
 #define _MQTTi_H
 
 #include "MQTTpacket.h"
-#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <stdio.h>
 
 /*  Interface to MQTTpackets and internet sockets */
 

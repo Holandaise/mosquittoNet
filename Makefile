@@ -9,3 +9,5 @@ default: $(OBJS)
 *.c:
 	gcc $(CFLAGS) $@
 
+clean:
+	rm -r *.o

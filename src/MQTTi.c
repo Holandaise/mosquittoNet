@@ -1,17 +1,16 @@
 #include "MQTTi.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
+
 // interface MQTT_Connect(), and MQTT_Subscribe functions
 // with the network. Think one layer out in the onion...
 
-CONTEXT *connectBroker(
-    const char* host,
-    int port,
-    const char* clientID
-){
-    //establish connection
+/* Create a connection to the MQTT broker
+ * @param: broker IP address
+ * @param: port number (1883 for MQTT)
+ * @param: client ID to pass to MQTTconnect()
+ * @return: pointer to a state context
+ */
+CONTEXT *connectBroker(const char *host, int port, const char *clientID)
+{
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
     CTX->BUFFER = malloc(sizeof(MQTTpacket));
     CTX->state = START; //if fail state won't change to connected
@@ -55,8 +54,16 @@ CONTEXT *connectBroker(
     return CTX;
 }
 
+/* Subscribe to a topic
+ * @param: Context received from connect()
+ * @param: topic to subscribe
+ * @param: QOS
+ */
 void subscribe(CONTEXT *ctx, const char *topic, char qos);
 
+/* Disconnect from server, and free all memory used in the context
+ * @param: pointer to the context
+ */
 void disconnect(CONTEXT *ctx){
     //free previous context
     //NOTE: unecessary because i'm smart, and free packet after previous

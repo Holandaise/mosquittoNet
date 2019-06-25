@@ -21,7 +21,6 @@ TODO:
 #ifndef _MQTTpacket_H
 #define _MQTTpacket_H
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -53,7 +52,7 @@ typedef struct MQTTheader{
     Generic MQTT message object
     Header is standard across all types of messages
     Payload differs based on message type
-    build() points to a funtion to build the specific message type
+    build() points to a function to build the specific message type
 */
 typedef struct MQTTpacket{
     MQTTheader header;
@@ -88,11 +87,9 @@ typedef struct SUB_PAYLOAD{
 	char QOS;
 }SUB_PAYLOAD;
 
-static const MQTTheader CONTROL_HEADERS[3]; // Array of pre-defined MQTT Headers indexed by Control Codes
-
 extern MQTTpacket CONNECT_P;    // Packet defined in MQTTpacket.c
 extern MQTTpacket SUBSCRIBE_P;  // Packet defined in MQTTpacket.c
-extern MQTTpacket DISCONN_P;
+extern MQTTpacket DISCONN_P;	// Packet defined in MQTTpacket.c
 
 void MQTT_Connect(MQTTpacket *CP, const char *clientID);
 void MQTT_Subscribe(MQTTpacket *SP, const char *topic, char QOS);
