@@ -1,13 +1,24 @@
-CFLAGS=-Iinc -Wall -Werror -g
-SOURCE_DIR=src
-PROG=mosquittoNet
-OBJS:=$(wildcard $(SOURCE_DIR)/*.c)
+CFLAGS:=-Wall -Werror -g
+CC:=gcc
+EXE:=mosquittoNet
+INCLUDES:=-Iinc
+SRCS:=$(wildcard src/*.c)
 
-default: $(OBJS)
-	gcc $(CFLAGS) -o $(PROG) $(OBJS)
+OBJS:=$(SRCS:.c=.o)
 
-*.c:
-	gcc $(CFLAGS) $@
+default: $(EXE)
+	gcc $(CFLAGS) -o $(EXE) $(OBJS)
 
+<<<<<<< HEAD
 clean:
 	rm -r *.o
+=======
+$(EXE): $(OBJS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(EXE) $(OBJS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+clean:
+	rm $(wildcard src/*.o) $(EXE)
+>>>>>>> feature
