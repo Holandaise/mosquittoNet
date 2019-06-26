@@ -43,8 +43,8 @@ typedef enum ControlCode{
     * Up to 4 Bytes for Remaining Length value
 */
 typedef struct MQTTheader{
-    char CNTL;
-    char remainingLen[4];
+    unsigned char CNTL;
+    unsigned char remainingLen[4];
 }MQTTheader;
 
 
@@ -68,12 +68,12 @@ typedef struct MQTTpacket{
 
 // Payload specific to MQTT-CONNECT message
 typedef struct CONN_PAYLOAD{
-	short   PROTO_NAME_LEN;
-	char    PROTO_NAME[4];
-	char    VERSION;
-	char    CONN_FLAGS;
-	short   KEEP_ALIVE;
-	short   CLIENT_ID_LEN;
+	unsigned short   PROTO_NAME_LEN;
+	unsigned char    PROTO_NAME[4];
+	unsigned char    VERSION;
+	unsigned char    CONN_FLAGS;
+	unsigned short   KEEP_ALIVE;
+	unsigned short   CLIENT_ID_LEN;
 	char*   CLIENT_ID;
 }CONN_PAYLOAD;
 
@@ -81,10 +81,10 @@ typedef struct CONN_PAYLOAD{
 
 // Payload specific to MQTT-SUBSCRIBE message
 typedef struct SUB_PAYLOAD{
-	short MSG_ID;
-	short TOPIC_LEN;
+	unsigned short MSG_ID;
+	unsigned short TOPIC_LEN;
+	unsigned char QOS;
 	char *TOPIC;
-	char QOS;
 }SUB_PAYLOAD;
 
 extern MQTTpacket CONNECT_P;    // Packet defined in MQTTpacket.c
@@ -92,6 +92,6 @@ extern MQTTpacket SUBSCRIBE_P;  // Packet defined in MQTTpacket.c
 extern MQTTpacket DISCONN_P;	// Packet defined in MQTTpacket.c
 
 void MQTT_Connect(MQTTpacket *CP, const char *clientID);
-void MQTT_Subscribe(MQTTpacket *SP, const char *topic, char QOS);
+void MQTT_Subscribe(MQTTpacket *SP, const char *topic, unsigned char QOS);
 
 #endif

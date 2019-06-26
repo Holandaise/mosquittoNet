@@ -24,12 +24,12 @@ typedef struct CONTEXT{
     struct sockaddr_in server;
     STATE state;
     int socket_fd;
-    int BUFF_SIZE;
+    unsigned int BUFF_SIZE;
     char *BUFFER;
 }CONTEXT;
 
-CONTEXT *connectBroker(const char *host, int port, const char *clientID);
-void subscribe(CONTEXT* ctx, const char *topic, char qos);
+CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID);
+void subscribe(CONTEXT* ctx, const char *topic, unsigned char qos);
 void publish(CONTEXT *ctx, const char *topic, const char *msg);
 void disconnect(CONTEXT *ctx);
 

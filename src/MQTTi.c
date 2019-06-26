@@ -9,7 +9,7 @@
  * @param: client ID to pass to MQTTconnect()
  * @return: pointer to a state context
  */
-CONTEXT *connectBroker(const char *host, int port, const char *clientID)
+CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID)
 {
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
     CTX->BUFFER = malloc(sizeof(MQTTpacket));
@@ -39,27 +39,38 @@ CONTEXT *connectBroker(const char *host, int port, const char *clientID)
     CTX->state = CONNECTED;
 
     CTX->BUFF_SIZE = recv(CTX->socket_fd, CTX->BUFFER, CTX->BUFF_SIZE,0);
-    if(CTX->BUFF_SIZE < 0){
-        puts("Connection not acknowledged");
-        close(CTX->socket_fd);
-        CTX->state = START;
-        return CTX;
-    }
-    for(int i=0; i<CTX->BUFF_SIZE; i++){
-        printf("%02X ", CTX->BUFFER[i]);
-    }
+
     if(CTX->BUFFER[0] == 0x20){
         CTX->state = CONN_ACK;
+		for(int i=0; i<CTX->BUFF_SIZE; i++){
+			printf("%02X ", CTX->BUFFER[i]);
+		}
     }
     return CTX;
 }
+
 
 /* Subscribe to a topic
  * @param: Context received from connect()
  * @param: topic to subscribe
  * @param: QOS
  */
-void subscribe(CONTEXT *ctx, const char *topic, char qos);
+void subscribe(CONTEXT *ctx, const char *topic, unsigned char qos)
+{
+	// TODO:
+	// may need to fork here to run separate subscribers
+	// 
+	ctx->packet = SUBSCRIBE_P;
+	MQTT_Subscribe(&ctx->packet, topic, qos);
+	ctx->BUFF_SIZE = ctx->packet.build(ctx->BUFFER, &ctx->packet);
+
+	if(send(ctx->socket_fd, ctx->BUFFER, ctx->BUFF_SIZE, 0)<0){
+		printf("Error: cannot subscribe to %s\n", topic);
+		close(ctx->socket_fd);
+	}
+	ctx->state = SUBSCRIBED;
+}
+
 
 /* Disconnect from server, and free all memory used in the context
  * @param: pointer to the context
@@ -84,3 +95,4 @@ void disconnect(CONTEXT *ctx){
     free(ctx->BUFFER);
     ctx->state = DISCONNECTED;
 }
+

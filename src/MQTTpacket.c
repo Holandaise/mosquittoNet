@@ -17,9 +17,9 @@ static const MQTTheader CONTROL_HEADERS[] = {
  * @param: size of the MQTT_packet
  * @return: number of bytes altered in the field
  */
-static int calcLength(char *p, int x)
+static int calcLength(unsigned char *p, unsigned int x)
 {
-	char encoded;
+	unsigned char encoded;
 	int i = 0;
 
 	do{
@@ -45,9 +45,9 @@ static int calcLength(char *p, int x)
 static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 {
 	CONN_PAYLOAD *PL = (CONN_PAYLOAD*)self->payload;
-	int size = sizeof(CONN_PAYLOAD) - sizeof(char *) + strlen(PL->CLIENT_ID);
+	unsigned int size = 12 + strlen(PL->CLIENT_ID);
 
-	int remLen = calcLength(
+	unsigned int remLen = calcLength(
 			self->header.remainingLen,
 			size
 			);
@@ -61,8 +61,9 @@ static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 	memcpy(BUFF+remLen+11, &PL->CLIENT_ID_LEN, 2);
 	strcpy(BUFF+remLen+13, PL->CLIENT_ID);
 
+	free(PL->CLIENT_ID);
 	free(PL);
-	return size + (3-remLen);
+	return size + remLen + 1;
 }
 
 /* Build MQTT subscribe message in BUFF
@@ -72,20 +73,21 @@ static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
  */
 static int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
 {
-	SUB_PAYLOAD *PL = (SUB_PAYLOAD*)self->payload;
-	int size = sizeof(SUB_PAYLOAD) - sizeof(char*) + strlen(PL->TOPIC);
-	int remLen = calcLength(
+	SUB_PAYLOAD *PL = (SUB_PAYLOAD *)self->payload;
+	unsigned int size = 5 + strlen(PL->TOPIC);
+	unsigned int remLen = calcLength(
 		self->header.remainingLen,
 		size);
 	
 	memcpy(BUFF, &self->header, remLen+1);
 	memcpy(BUFF+remLen+1, PL, 4);
 	strcpy(BUFF+remLen+5, PL->TOPIC);
+	memcpy(BUFF+remLen+5+strlen(PL->TOPIC), &PL->QOS, 1);
 
-	//todo move QOS into buffer, and update retval
+	free(PL->TOPIC);
 	free(self->payload);
-	// 3-remLen = header size
-	return (size + (3-remLen));
+	// 3-remLen = header size 
+	return size + remLen + 1;
 }
 
 /* Build MQTT Disconnect message in BUFF
@@ -149,9 +151,9 @@ void MQTT_Connect(MQTTpacket *CP, const char *clientID)
  * @param: topic name
  * @param: QOS 1-3
  */
-void MQTT_Subscribe(MQTTpacket *SP, const char* topic, char qos)
+void MQTT_Subscribe(MQTTpacket *SP, const char* topic, unsigned char qos)
 {
-	static int ID = 1;
+	static unsigned int ID = 1;
 	SP->payload = (SUB_PAYLOAD*)malloc(sizeof(SUB_PAYLOAD));
 	SUB_PAYLOAD *PL = SP->payload;
 	PL->TOPIC_LEN = htons(strlen(topic));
