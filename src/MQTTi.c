@@ -42,9 +42,6 @@ CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID
 
     if(CTX->BUFFER[0] == 0x20){
         CTX->state = CONN_ACK;
-		for(int i=0; i<CTX->BUFF_SIZE; i++){
-			printf("%02X ", CTX->BUFFER[i]);
-		}
     }
     return CTX;
 }
