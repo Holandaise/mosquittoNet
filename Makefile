@@ -9,8 +9,6 @@ OBJS:=$(SRCS:.c=.o)
 default: $(EXE)
 	$(CC) $(CFLAGS) -o $(EXE) $(OBJS)
 
-clean:
-	rm -r *.o
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(EXE) $(OBJS)
 

@@ -12,7 +12,7 @@
 CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID)
 {
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
-    CTX->BUFFER = malloc(sizeof(MQTTpacket));
+    CTX->BUFFER = malloc(512);
     CTX->state = START; //if fail state won't change to connected
     CTX->packet = CONNECT_P;
     MQTT_Connect(&CTX->packet, clientID);
@@ -65,7 +65,12 @@ void subscribe(CONTEXT *ctx, const char *topic, unsigned char qos)
 		printf("Error: cannot subscribe to %s\n", topic);
 		close(ctx->socket_fd);
 	}
-	ctx->state = SUBSCRIBED;
+
+	ctx->BUFF_SIZE = recv(ctx->socket_fd, ctx->BUFFER, 512, 0);
+
+	if(ctx->BUFFER[0] == 0x90){
+		ctx->state = SUBSCRIBED;
+	}
 }
 
 
