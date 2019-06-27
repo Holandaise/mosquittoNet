@@ -2,12 +2,12 @@
 
 int main(){
     CONTEXT *ctx = connectBroker("192.168.0.101", 1883, "mosq_001");
-	getchar();
 	subscribe(ctx, "/test/switch", 0);
-	getchar();
-	if(ctx->state == SUBSCRIBED){
-		printf("Halelujah\n");
-	}
+
+	int x = recv(ctx->socket_fd, ctx->BUFFER, 17, MSG_WAITALL);
+
+	printf("%d bytes recieved from broker\n", x);
+
     disconnect(ctx);
     free(ctx);
     return 0;

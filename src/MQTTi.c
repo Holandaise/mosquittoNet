@@ -92,4 +92,3 @@ void disconnect(CONTEXT *ctx){
     free(ctx->BUFFER);
     ctx->state = DISCONNECTED;
 }
-

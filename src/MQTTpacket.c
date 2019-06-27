@@ -7,7 +7,7 @@
 static const MQTTheader CONTROL_HEADERS[] = {
 	{0x10, {0,0,0,0}},
 	{0xE0, {0,0,0,0}},
-    {0x80, {0,0,0,0}}
+    {0x82, {0,0,0,0}}
 };
 
 /* Static Functions */
