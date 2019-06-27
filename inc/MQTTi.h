@@ -8,7 +8,10 @@
 #include <sys/socket.h>
 #include <stdio.h>
 
-/*  Interface to MQTTpackets and internet sockets */
+/*==============================================================================
+ * Interface to MQTTpackets and internet sockets
+ *============================================================================== 
+ */
 
 typedef enum STATE{
     START,

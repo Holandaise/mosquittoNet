@@ -24,11 +24,12 @@ TODO:
 #include <stdlib.h>
 #include <string.h>
 
+
 /*
------------------------------------------------------------------------------
-    Basic Structures for building MQTT messages
------------------------------------------------------------------------------
-*/
+ * ============================================================================
+ * 	Basic Structures for building MQTT messages
+ * ============================================================================
+ */
 
 // Index for MQTT header Control Codes
 typedef enum ControlCode{
@@ -61,10 +62,10 @@ typedef struct MQTTpacket{
 }MQTTpacket;
 
 /*
--------------------------------------------------------------------------------
-    Implemented structures and function declarations
--------------------------------------------------------------------------------
-*/
+ *==============================================================================
+ *  	Implement Structures and function declarations
+ *==============================================================================
+ */
 
 // Payload specific to MQTT-CONNECT message
 typedef struct CONN_PAYLOAD{
