@@ -8,9 +8,9 @@
 
 // Definition of all MQTT control headers
 static const MQTTheader CONTROL_HEADERS[] = {
-	{0x10, {0,0,0,0}},	//Connect
-	{0xE0, {0,0,0,0}},	//Subscribe
-    {0x82, {0,0,0,0}}	//Disconnect
+	{0x10, {0,0,0,0}},  	//Connect
+	{0xE0, {0,0,0,0}},    //Disconnect
+	{0x82, {0,0,0,0}}   //Subscribe
 };
 
 /*============================================================================== 
@@ -152,8 +152,8 @@ void MQTT_Connect(MQTTpacket *CP, const char *clientID, unsigned short keep_aliv
 	strcpy((char*)PL->CLIENT_ID, clientID);
 	memcpy(PL->PROTO_NAME, "MQTT", 4);
 	PL->VERSION = 4;
-	PL->PROTO_NAME_LEN = htons(keep_alive);
-	PL->KEEP_ALIVE = htons(5);
+	PL->PROTO_NAME_LEN = htons(4);
+	PL->KEEP_ALIVE = htons(keep_alive);
 	PL->CONN_FLAGS = 2;
 }
 
