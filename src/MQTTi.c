@@ -83,10 +83,6 @@ void subscribe(CONTEXT *ctx, const char *topic, unsigned char qos)
  * @param: pointer to the context
  */
 void disconnect(CONTEXT *ctx){
-    //free previous context
-    //NOTE: unecessary because i'm smart, and free packet after previous
-    // buffer is written *wink wink*
-    //free(ctx->packet.payload);
 
     //send disconnect
     ctx->packet = DISCONN_P;
