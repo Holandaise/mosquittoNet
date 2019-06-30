@@ -1,7 +1,10 @@
 #include "MQTTpacket.h"
 #include <arpa/inet.h>
 
-/* Static Variables */
+/*============================================================================== 
+ * Static Variables
+ *==============================================================================
+ */
 
 // Definition of all MQTT control headers
 static const MQTTheader CONTROL_HEADERS[] = {
@@ -10,7 +13,10 @@ static const MQTTheader CONTROL_HEADERS[] = {
     {0x82, {0,0,0,0}}	//Disconnect
 };
 
-/* Static Functions */
+/*============================================================================== 
+ * Static Functions
+ *==============================================================================
+ */
 
 /* Calculate Remaining Length, and insert into field
  * @param: pointer to MQTT_packet's remaining length field
@@ -100,7 +106,12 @@ static int DISCONNECTbuilder(unsigned char *BUFF, MQTTpacket *self)
 
 	return 2;
 }
-/* Interface Variables */
+
+
+/*============================================================================== 
+ * Interface Variables
+ *==============================================================================
+ */
 
 // Concrete connect packet
 MQTTpacket CONNECT_P = {
@@ -123,8 +134,10 @@ MQTTpacket SUBSCRIBE_P = {
     SUBSCRIBEbuilder
 };
 
-
-/*	Interface Functions	*/
+/*============================================================================== 
+ * Interface Functions
+ *==============================================================================
+ */
 
 /* Build the connect packet
  * @param: pointer to CONNECT_P

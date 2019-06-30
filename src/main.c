@@ -26,6 +26,11 @@ int main(){
 	}
 
     disconnect(ctx);
+
+	if(ctx->state == DISCONNECTED){
+		printf("Disconnected... exiting\n");
+	}
+
     free(ctx);
     return 0;
 }

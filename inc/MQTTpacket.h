@@ -1,16 +1,4 @@
 /*
-Copyright: Adam Lewis Montgomery
-Date: 06/21/2019
-
-MQTTpacket is a library for the creation of MQTT message structures that
-can be sent over the network to a broker. This library does not implement
-any networking but simply forms the data into a network transferrable byte
-array. It also can read a byte array from the network, and build appropriate
-MQTT message structures for programming logic to handle.
-
-*/
-
-/*
 TODO:
     Create remaining Control Headers,
     Add Control Codes,
@@ -21,40 +9,9 @@ TODO:
 #ifndef _MQTTpacket_H
 #define _MQTTpacket_H
 
+#include "MQTTcore.h"
 #include <stdlib.h>
 #include <string.h>
-
-/*
- * ============================================================================
- * 	Basic Structures for building MQTT messages
- * ============================================================================
- */
-
-// Index for MQTT header Control Codes
-typedef enum ControlCode{
-    CONNECT,
-    DISCONNECT,
-    SUBSCRIBE
-}ControlCode;
-
-
-typedef struct MQTTheader{
-    unsigned char CNTL;
-    unsigned char remainingLen[4];
-}MQTTheader;
-
-
-/*
-    Generic MQTT message object
-    Header is standard across all types of messages
-    Payload differs based on message type
-    build() points to a function to build the specific message type
-*/
-typedef struct MQTTpacket{
-    MQTTheader header;
-    void *payload;
-    int (*build)(unsigned char *BUFF, struct MQTTpacket *self);
-}MQTTpacket;
 
 /*
  *==============================================================================
@@ -83,9 +40,6 @@ typedef struct SUB_PAYLOAD{
 	char *TOPIC;
 }SUB_PAYLOAD;
 
-extern MQTTpacket CONNECT_P;    // Packet defined in MQTTpacket.c
-extern MQTTpacket SUBSCRIBE_P;  // Packet defined in MQTTpacket.c
-extern MQTTpacket DISCONN_P;	// Packet defined in MQTTpacket.c
 
 void MQTT_Connect(MQTTpacket *CP, const char *clientID, unsigned short keep_alive);
 void MQTT_Subscribe(MQTTpacket *SP, const char *topic, unsigned char QOS);

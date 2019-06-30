@@ -12,7 +12,7 @@
 CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID, unsigned short keep_alive)
 {
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
-    CTX->BUFFER = malloc(512);
+    CTX->BUFFER = malloc(1024);
     CTX->state = START; //if fail state won't change to connected
     CTX->packet = CONNECT_P;
     MQTT_Connect(&CTX->packet, clientID, keep_alive);
