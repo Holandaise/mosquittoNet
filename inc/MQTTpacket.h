@@ -24,7 +24,6 @@ TODO:
 #include <stdlib.h>
 #include <string.h>
 
-
 /*
  * ============================================================================
  * 	Basic Structures for building MQTT messages
@@ -38,11 +37,7 @@ typedef enum ControlCode{
     SUBSCRIBE
 }ControlCode;
 
-/*
-    Generic MQTT header
-    * 1 Byte for Control Code
-    * Up to 4 Bytes for Remaining Length value
-*/
+
 typedef struct MQTTheader{
     unsigned char CNTL;
     unsigned char remainingLen[4];
@@ -58,7 +53,7 @@ typedef struct MQTTheader{
 typedef struct MQTTpacket{
     MQTTheader header;
     void *payload;
-    int (*build)(char *BUFF, struct MQTTpacket *self);
+    int (*build)(unsigned char *BUFF, struct MQTTpacket *self);
 }MQTTpacket;
 
 /*
@@ -92,7 +87,7 @@ extern MQTTpacket CONNECT_P;    // Packet defined in MQTTpacket.c
 extern MQTTpacket SUBSCRIBE_P;  // Packet defined in MQTTpacket.c
 extern MQTTpacket DISCONN_P;	// Packet defined in MQTTpacket.c
 
-void MQTT_Connect(MQTTpacket *CP, const char *clientID);
+void MQTT_Connect(MQTTpacket *CP, const char *clientID, unsigned short keep_alive);
 void MQTT_Subscribe(MQTTpacket *SP, const char *topic, unsigned char QOS);
 
 #endif

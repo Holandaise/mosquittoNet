@@ -5,15 +5,15 @@
 
 // Definition of all MQTT control headers
 static const MQTTheader CONTROL_HEADERS[] = {
-	{0x10, {0,0,0,0}},
-	{0xE0, {0,0,0,0}},
-    {0x82, {0,0,0,0}}
+	{0x10, {0,0,0,0}},	//Connect
+	{0xE0, {0,0,0,0}},	//Subscribe
+    {0x82, {0,0,0,0}}	//Disconnect
 };
 
 /* Static Functions */
 
 /* Calculate Remaining Length, and insert into field
- * @param: pointer to MQTT_packet
+ * @param: pointer to MQTT_packet's remaining length field
  * @param: size of the MQTT_packet
  * @return: number of bytes altered in the field
  */
@@ -42,7 +42,7 @@ static int calcLength(unsigned char *p, unsigned int x)
  * @param: pointer to MQTT Connect Packet
  * @return: number of bytes written to BUFF
  */
-static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
+static int CONNECTbuilder(unsigned char *BUFF, MQTTpacket *self)
 {
 	CONN_PAYLOAD *PL = (CONN_PAYLOAD*)self->payload;
 	unsigned int size = 12 + strlen(PL->CLIENT_ID);
@@ -59,7 +59,7 @@ static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
 	memcpy(BUFF+remLen+8, &PL->CONN_FLAGS, 1);
 	memcpy(BUFF+remLen+9, &PL->KEEP_ALIVE, 2);
 	memcpy(BUFF+remLen+11, &PL->CLIENT_ID_LEN, 2);
-	strcpy(BUFF+remLen+13, PL->CLIENT_ID);
+	strcpy((char*)BUFF+remLen+13, PL->CLIENT_ID);
 
 	free(PL->CLIENT_ID);
 	free(PL);
@@ -71,17 +71,15 @@ static int CONNECTbuilder(char *BUFF, MQTTpacket *self)
  * @param: pointer to MQTT Subscribe Packet
  * @return: number of bytes written to BUFF
  */
-static int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
+static int SUBSCRIBEbuilder(unsigned char *BUFF, MQTTpacket *self)
 {
 	SUB_PAYLOAD *PL = (SUB_PAYLOAD *)self->payload;
 	unsigned int size = 5 + strlen(PL->TOPIC);
-	unsigned int remLen = calcLength(
-		self->header.remainingLen,
-		size);
+	unsigned int remLen = calcLength(self->header.remainingLen,	size);
 	
 	memcpy(BUFF, &self->header, remLen+1);
 	memcpy(BUFF+remLen+1, PL, 4);
-	strcpy(BUFF+remLen+5, PL->TOPIC);
+	strcpy((char*)BUFF+remLen+5, PL->TOPIC);
 	memcpy(BUFF+remLen+5+strlen(PL->TOPIC), &PL->QOS, 1);
 
 	free(PL->TOPIC);
@@ -95,7 +93,7 @@ static int SUBSCRIBEbuilder(char *BUFF, MQTTpacket *self)
  * @param: pointer to MQTT Disconnect Packet
  * @return: number of bytes written to BUFF
  */
-static int DISCONNECTbuilder(char *BUFF, MQTTpacket *self)
+static int DISCONNECTbuilder(unsigned char *BUFF, MQTTpacket *self)
 {
 	// Only Control Header and 1 byte of remaining length set to 0
 	memcpy(BUFF, &self->header, 2);
@@ -132,17 +130,17 @@ MQTTpacket SUBSCRIBE_P = {
  * @param: pointer to CONNECT_P
  * @param: name for server to register
  */
-void MQTT_Connect(MQTTpacket *CP, const char *clientID)
+void MQTT_Connect(MQTTpacket *CP, const char *clientID, unsigned short keep_alive)
 {
 	CP->payload = (CONN_PAYLOAD*)malloc(sizeof(CONN_PAYLOAD));
 	CONN_PAYLOAD *PL = CP->payload;
 	PL->CLIENT_ID = malloc(sizeof(char *));
 	PL->CLIENT_ID_LEN = htons(strlen(clientID));
-	strcpy(PL->CLIENT_ID, clientID);
+	strcpy((char*)PL->CLIENT_ID, clientID);
 	memcpy(PL->PROTO_NAME, "MQTT", 4);
 	PL->VERSION = 4;
-	PL->PROTO_NAME_LEN = htons(4);
-	PL->KEEP_ALIVE = htons(40);
+	PL->PROTO_NAME_LEN = htons(keep_alive);
+	PL->KEEP_ALIVE = htons(5);
 	PL->CONN_FLAGS = 2;
 }
 
@@ -160,7 +158,7 @@ void MQTT_Subscribe(MQTTpacket *SP, const char* topic, unsigned char qos)
 	PL->TOPIC = malloc(sizeof(char*));
 	PL->QOS = htons(SP->header.CNTL|=qos);
 	PL->MSG_ID = htons(ID);
-	strcpy(PL->TOPIC, topic);
+	strcpy((char*)PL->TOPIC, topic);
 
 	ID++;
 }

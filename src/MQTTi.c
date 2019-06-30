@@ -1,7 +1,7 @@
 #include "MQTTi.h"
-
 // interface MQTT_Connect(), and MQTT_Subscribe functions
 // with the network. Think one layer out in the onion...
+
 
 /* Create a connection to the MQTT broker
  * @param: broker IP address
@@ -9,13 +9,13 @@
  * @param: client ID to pass to MQTTconnect()
  * @return: pointer to a state context
  */
-CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID)
+CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID, unsigned short keep_alive)
 {
     CONTEXT *CTX = malloc(sizeof(CONTEXT));
     CTX->BUFFER = malloc(512);
     CTX->state = START; //if fail state won't change to connected
     CTX->packet = CONNECT_P;
-    MQTT_Connect(&CTX->packet, clientID);
+    MQTT_Connect(&CTX->packet, clientID, keep_alive);
     CTX->BUFF_SIZE = CTX->packet.build(CTX->BUFFER, &CTX->packet);
     CTX->socket_fd = socket(AF_INET, SOCK_STREAM,0);
     if(CTX->socket_fd < 0){
@@ -39,6 +39,9 @@ CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID
     CTX->state = CONNECTED;
 
     CTX->BUFF_SIZE = recv(CTX->socket_fd, CTX->BUFFER, CTX->BUFF_SIZE,0);
+
+	//	debug
+	//printf("%02X\n", CTX->BUFFER[0]);
 
     if(CTX->BUFFER[0] == 0x20){
         CTX->state = CONN_ACK;
@@ -68,6 +71,8 @@ void subscribe(CONTEXT *ctx, const char *topic, unsigned char qos)
 
 	ctx->BUFF_SIZE = recv(ctx->socket_fd, ctx->BUFFER, 512, 0);
 
+	//	debug
+	//printf("%02X\n", ctx->BUFFER[0]);
 	if(ctx->BUFFER[0] == 0x90){
 		ctx->state = SUBSCRIBED;
 	}

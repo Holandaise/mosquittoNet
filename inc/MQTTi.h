@@ -12,7 +12,6 @@
  * Interface to MQTTpackets and internet sockets
  *============================================================================== 
  */
-
 typedef enum STATE{
     START,
     CONNECTED,
@@ -28,10 +27,10 @@ typedef struct CONTEXT{
     STATE state;
     int socket_fd;
     unsigned int BUFF_SIZE;
-    char *BUFFER;
+    unsigned char *BUFFER;
 }CONTEXT;
 
-CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID);
+CONTEXT *connectBroker(const char *host, unsigned int port, const char *clientID, unsigned short keep_alive);
 void subscribe(CONTEXT* ctx, const char *topic, unsigned char qos);
 void publish(CONTEXT *ctx, const char *topic, const char *msg);
 void disconnect(CONTEXT *ctx);
